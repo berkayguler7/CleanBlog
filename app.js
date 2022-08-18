@@ -1,9 +1,12 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const PORT = 3000;
 
+app.use(express.static('public'));
+
 app.get('/', (req, res) => {
-    res.send( { id: 1, title: "Blog title", description: "Blog description" });
+    res.sendFile(path.resolve(__dirname, 'views/index.html'));
 })
 
 app.listen(PORT, () => {
