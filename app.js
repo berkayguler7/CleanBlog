@@ -1,19 +1,30 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const Post = require('./models/post');
 const ejs = require('ejs');
 const path = require('path');
-const app = express();
+const { PhoneNumberContext } = require('twilio/lib/rest/lookups/v1/phoneNumber');
 const PORT = 3000;
 
+const app = express();
+
+mongoose.connect('mongodb://localhost/cleanblog-test-db');
 
 //TEMPLATE ENGINE
 app.set('view engine', 'ejs');
 
 //MIDDLEWARES
 app.use(express.static('public'));
+app.use(express.urlencoded({extended:true}))
+app.use(express.json())
+
 
 //ROUTES
-app.get('/', (req, res) => {
-    res.render('index');
+app.get('/', async (req, res) => {
+    const posts = await Post.find();
+    res.render('index', {
+        posts
+    });
 })
 
 app.get('/about', (req, res) => {
@@ -26,6 +37,12 @@ app.get('/add_post', (req, res) => {
 
 app.get('/post', (req, res) => {
     res.render('post');
+})
+
+app.post('/add_post', async (req, res) => {
+    console.log(req.body);
+    await Post.create(req.body);
+    res.redirect('/');
 })
 
 //404
