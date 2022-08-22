@@ -30,6 +30,17 @@
         </div>
       </div>
     </div>
+    <br><br>
+    <div class="row" style="justify-content:center">
+      <div class="text-center">
+        <a href="/posts/edit/<%= post._id %>" class="btn btn-primary mx-3"><span>Update Details</span></a>	
+      </div>
+      <div class="text-center">
+        <a href="/posts/<%= post._id %>?_method=DELETE" class="btn btn-danger mx-3" 
+          onclick="return confirm('This will permanently remove the post, are you sure?')"><span>Delete Post</span></a>	
+      </div>
+    </div>
+
   </article>
 
   <hr>

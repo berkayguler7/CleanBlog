@@ -1,9 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Post = require('./models/post');
+const methodOverride = require('method-override');
+
 const ejs = require('ejs');
-const path = require('path');
-const { PhoneNumberContext } = require('twilio/lib/rest/lookups/v1/phoneNumber');
+const postController = require('./controllers/postController');
+const pageController = require('./controllers/pageController');
+
 const PORT = 3000;
 
 const app = express();
@@ -15,50 +18,30 @@ app.set('view engine', 'ejs');
 
 //MIDDLEWARES
 app.use(express.static('public'));
-app.use(express.urlencoded({extended:true}))
-app.use(express.json())
-
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(
+    methodOverride('_method', {
+        methods: ['POST', 'GET'],
+    })
+);
 
 //ROUTES
-app.get('/', async (req, res) => {
-    const posts = await Post.find();
-    res.render('index', {
-        posts
-    });
-})
+app.get('/', postController.getAllPosts);
+app.get('/posts/:id', postController.getPost);
+app.post('/add_post', postController.createPost);
+app.put('/posts/:id', postController.updatePost);
+app.delete('/posts/:id', postController.deletePost);
 
-app.get('/about', (req, res) => {
-    res.render('about');
-})
-
-app.get('/add_post', (req, res) => {
-    res.render('add_post');
-})
-
-app.get('/posts', (req, res) => {
-    res.render('post');
-})
-
-app.get('/posts/:id', async (req, res) => {
-    console.log(req.params.id)
-    const post = await Post.findById(req.params.id)
-    console.log(post);
-    res.render('post', {
-        post
-    });
-})
-
-app.post('/add_post', async (req, res) => {
-    console.log(req.body);
-    await Post.create(req.body);
-    res.redirect('/');
-})
+app.get('/posts/edit/:id', pageController.getEditPage);
+app.get('/about', pageController.getAboutPage);
+app.get('/add_post', pageController.getAddPage);
 
 //404
 app.get('*', (req, res) => {
     res.send('<h1>404 NOT FOUND</h1>');
-})
+});
 
 app.listen(PORT, () => {
     console.log(`Server is live on port ${PORT}`);
-})
+});
