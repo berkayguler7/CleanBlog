@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const mongoose = require('mongoose');
 const Post = require('./models/post');
 const methodOverride = require('method-override');
@@ -7,11 +8,7 @@ const ejs = require('ejs');
 const postController = require('./controllers/postController');
 const pageController = require('./controllers/pageController');
 
-const PORT = 3000;
-
 const app = express();
-
-mongoose.connect('mongodb://localhost/cleanblog-test-db');
 
 //TEMPLATE ENGINE
 app.set('view engine', 'ejs');
@@ -42,6 +39,16 @@ app.get('*', (req, res) => {
     res.send('<h1>404 NOT FOUND</h1>');
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is live on port ${PORT}`);
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => {
+    console.log('DBCONN!');
+    app.listen(process.env.PORT, () => {
+        console.log(`Server is live on port ${process.env.PORT}`);
+    });
+})
+.catch((err) => {
+    console.log(err);
 });
